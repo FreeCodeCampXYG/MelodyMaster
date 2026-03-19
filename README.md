@@ -129,8 +129,13 @@ python -m http.server 8000
 本项目采用 [MIT License](https://www.google.com/url?sa=E&q=LICENSE) 协议。您可以自由地使用、修改和分发。
 
 ------
-
-
+## 项目图：
+### 主界面
+<img width="2139" height="1157" alt="image" src="https://github.com/user-attachments/assets/93fc5529-4e5c-4495-af8f-abe8a63856d7" />
+### 已知五线谱音符选音名
+<img width="1936" height="1134" alt="image" src="https://github.com/user-attachments/assets/fd1e148e-2ba2-4c9f-ad94-64984bbb2ae1" />
+### 已知五线谱音名字选音符
+<img width="2037" height="1167" alt="image" src="https://github.com/user-attachments/assets/81a3e2af-643f-418b-86d5-0473223ab242" />
 
 **如果你觉得这个工具有帮助，欢迎给一个 ⭐️ Star！**
 **如有任何建议，欢迎提交 Issue 或 Pull Request。**
