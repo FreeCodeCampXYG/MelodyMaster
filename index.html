@@ -3,71 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MelodyMaster Pro | @墨点星痕</title>
+    <title>MelodyMaster Pro v2.0 | @墨点星痕</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --navy: #1A365D; --gold: #D4AF37; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
-            --success: #00ff88; --danger: #ff4444;
+            --success: #00ff88; --danger: #ff4444; --accent: #6366f1;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
         /* 导航与头部 */
         header { background: var(--navy); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); position: sticky; top:0; z-index:100; }
         .user-pill { background: rgba(212,175,55,0.1); border: 1px solid var(--gold); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; color: var(--gold); cursor: pointer; font-weight: bold; }
         
-        /* 容器 */
+        /* 设置栏 */
+        .settings-bar { background: #1e293b; padding: 10px; display: flex; justify-content: center; gap: 10px; border-bottom: 1px solid #334155; }
+        .toggle-btn { background: #0f172a; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; cursor: pointer; }
+        .toggle-btn.active { background: var(--gold); color: var(--navy); font-weight: bold; }
+
         .container { max-width: 1000px; margin: 0 auto; width: 100%; padding: 1rem; flex: 1; }
         
         /* 登录模态框 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .login-card { background: var(--card); padding: 2rem; border-radius: 20px; border: 2px solid var(--gold); width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .login-card { background: var(--card); padding: 2rem; border-radius: 20px; border: 2px solid var(--gold); width: 90%; max-width: 400px; text-align: center; }
         .login-card input { width: 100%; padding: 15px; border-radius: 10px; border: none; margin: 1.5rem 0; font-size: 1.1rem; background: #0f172a; color: white; text-align: center; border: 1px solid #334155; }
         
         /* 大厅卡片 */
-        .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .level-card { background: var(--card); border-radius: 15px; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .level-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+        .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .level-card { background: var(--card); border-radius: 15px; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.05); }
         .level-card h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--gold); border-left: 3px solid var(--gold); padding-left: 10px; }
         
         /* 游戏区域 */
-        .stave-box { background: white; border-radius: 15px; height: 280px; position: relative; border: 5px solid var(--navy); touch-action: none; overflow: hidden; cursor: crosshair; }
+        .stave-box { background: white; border-radius: 15px; height: 260px; position: relative; border: 5px solid var(--navy); touch-action: none; overflow: hidden; }
         .stave-line { stroke: #000; stroke-width: 2.5; }
         
-        /* 指引系统 */
-        .guide-line { stroke: var(--navy); stroke-width: 1.5; stroke-dasharray: 4; opacity: 0.4; pointer-events: none; }
-        .ghost-note { fill: none; stroke: var(--navy); stroke-width: 3; stroke-dasharray: 2; }
+        .guide-line { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4; opacity: 0.5; pointer-events: none; }
+        .ghost-note { fill: rgba(99, 102, 241, 0.3); stroke: var(--accent); stroke-width: 2; }
         
         /* 按钮 */
-        .btn { background: var(--navy); color: white; border: 2px solid var(--gold); padding: 1rem; border-radius: 12px; font-weight: 900; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
-        .btn:active { background: var(--gold); color: var(--navy); transform: scale(0.95); }
-        .btn-sm { padding: 8px 15px; font-size: 0.9rem; }
+        .btn { background: var(--navy); color: white; border: 2px solid var(--gold); padding: 1rem; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-confirm { background: var(--accent); border-color: white; width: 100%; margin-top: 15px; display: none; padding: 1.2rem; }
 
         /* 纠错反馈 */
-        #global-click-layer { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.2); display: none; cursor: pointer; align-items: flex-end; justify-content: center; padding-bottom: 50px; }
-        .hint-bar { background: #fff; color: #000; padding: 15px 40px; border-radius: 50px; font-weight: 900; border: 4px solid var(--navy); box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: bounce 1s infinite; }
+        #global-click-layer { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.4); display: none; align-items: flex-end; justify-content: center; padding-bottom: 80px; }
+        .hint-bar { background: #fff; color: #000; padding: 15px 40px; border-radius: 50px; font-weight: 900; border: 4px solid var(--navy); }
 
-        /* 统计与日志 */
         .panel { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1.2rem; margin-top: 1.5rem; border: 1px solid #334155; }
-        .error-chip { display: inline-block; background: #000; padding: 6px 12px; border-radius: 8px; margin: 5px; font-size: 0.85rem; border: 1px solid #f44336; }
-        .log-item { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .error-chip { display: inline-block; background: #000; padding: 6px 12px; border-radius: 8px; margin: 5px; font-size: 0.8rem; border: 1px solid var(--danger); }
 
-        footer { background: #000; color: #555; text-align: center; padding: 1.5rem; font-size: 0.75rem; border-top: 1px solid var(--gold); }
+        footer { background: #000; color: #555; text-align: center; padding: 1.5rem; font-size: 0.75rem; }
         .hidden { display: none !important; }
         .correct-note { fill: var(--success); stroke: #000; stroke-width: 2; }
         .wrong-note { fill: var(--danger); stroke: #000; stroke-width: 2; }
-        @keyframes bounce { 0%,100% {transform:translateY(0)} 50% {transform:translateY(-10px)} }
+        
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .confirm-anim { animation: pulse 1s infinite; }
     </style>
 </head>
 <body>
 
-<!-- 初始登录 -->
 <div id="login-modal" class="modal-overlay hidden">
     <div class="login-card">
         <h2 style="color:var(--gold); margin:0;">识别身份</h2>
         <input type="text" id="user-input" placeholder="输入你的大名..." maxlength="10">
-        <div id="user-history-list" style="text-align:left; margin-bottom:1.5rem;"></div>
+        <div id="user-history-list" style="text-align:left; margin-bottom:1.5rem; max-height: 150px; overflow-y: auto;"></div>
         <button onclick="UserSystem.login()" class="btn" style="width:100%;">开始练习</button>
     </div>
 </div>
@@ -75,41 +76,45 @@
 <header>
     <div style="display:flex; align-items:center; gap:10px;">
         <div style="background:var(--gold); color:var(--navy); font-weight:900; padding:4px 8px; border-radius:5px;">MM</div>
-        <div style="font-weight:900; letter-spacing:1px;">MelodyMaster <span style="font-weight:100; font-size:0.7rem;">ULTIMATE</span></div>
+        <div style="font-weight:900; letter-spacing:1px;">MelodyMaster <span style="font-weight:100; font-size:0.7rem;">PRO v2.0</span></div>
     </div>
     <div id="user-display" class="user-pill" onclick="UserSystem.showLogin()">载入中...</div>
 </header>
 
+<!-- 全局设置选项 -->
+<div class="settings-bar">
+    <span style="font-size: 0.75rem; color: #94a3b8; align-self: center;">显示模式:</span>
+    <button class="toggle-btn active" id="mode-name" onclick="Config.setMode('name')">音名 (CDE)</button>
+    <button class="toggle-btn" id="mode-sol" onclick="Config.setMode('sol')">唱名 (DoReMi)</button>
+    <button class="toggle-btn" id="mode-both" onclick="Config.setMode('both')">混合显示</button>
+</div>
+
 <div id="global-click-layer" onclick="Game.nextQuestion()">
-    <div class="hint-bar">对比已显示，点击屏幕任意处继续 →</div>
+    <div class="hint-bar">点击屏幕任意处继续 →</div>
 </div>
 
 <div id="lobby-view" class="container">
-    <h2 style="margin:0 0 1rem 0; font-size:1.2rem; color:var(--gold);">🎯 训练维度矩阵</h2>
+    <h2 style="margin:0 0 1rem 0; font-size:1.2rem; color:var(--gold);">🎯 训练维度 (每组20题)</h2>
     <div id="level-matrix" class="matrix-grid"></div>
 
     <div class="panel">
-        <h3 style="margin:0 0 10px 0; font-size:0.9rem; color:var(--danger);">❌ 高频弱项 (错题积累)</h3>
-        <div id="error-list">暂无错题记录，保持完美！</div>
-    </div>
-
-    <div class="panel">
-        <h3 style="margin:0 0 10px 0; font-size:0.9rem; color:var(--gold);">📜 最近访问日志</h3>
-        <div id="visit-logs"></div>
+        <h3 style="margin:0 0 10px 0; font-size:0.9rem; color:var(--danger);">❌ 高频弱项</h3>
+        <div id="error-list">暂无错题。</div>
     </div>
 </div>
 
 <div id="game-view" class="container hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <button onclick="Game.exit()" class="btn btn-sm">← 退出大厅</button>
+        <button onclick="Game.exit()" class="btn" style="padding: 5px 15px; font-size: 0.9rem;">退出</button>
         <div id="timer-display" style="font-family:monospace; color:var(--gold); font-size:1.4rem; font-weight:900;">0.00s</div>
+        <div id="game-progress" style="font-weight:bold; color:var(--accent);">0 / 20</div>
     </div>
 
-    <div id="instruction" style="text-align:center; font-weight:900; font-size:1.2rem; color:var(--gold); margin-bottom:15px; background:rgba(212,175,55,0.1); padding:12px; border-radius:10px;">...</div>
+    <div id="instruction" style="text-align:center; font-weight:900; font-size:1.2rem; color:var(--gold); margin-bottom:15px; background:rgba(212,175,55,0.1); padding:12px; border-radius:10px; min-height: 3rem; display: flex; align-items: center; justify-content: center;">...</div>
     
     <div class="stave-box" id="stave-click-area">
         <svg id="svg-main" viewBox="0 0 400 240" width="100%" height="100%">
-            <g id="stave-base-group">
+            <g id="stave-lines">
                 <line x1="10" y1="80" x2="390" y2="80" class="stave-line" />
                 <line x1="10" y1="100" x2="390" y2="100" class="stave-line" />
                 <line x1="10" y1="120" x2="390" y2="120" class="stave-line" />
@@ -125,38 +130,56 @@
         </svg>
     </div>
 
-    <div id="input-zone" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:10px; margin-top:1.5rem;">
-        <button class="btn" data-p="C">C</button>
-        <button class="btn" data-p="D">D</button>
-        <button class="btn" data-p="E">E</button>
-        <button class="btn" data-p="F">F</button>
-        <button class="btn" data-p="G">G</button>
-        <button class="btn" data-p="A">A</button>
-        <button class="btn" data-p="B">B</button>
+    <!-- 标位模式专用的确认按钮 -->
+    <button id="confirm-btn" class="btn btn-confirm" onclick="Game.confirmPlacement()">确 定 位 置</button>
+
+    <div id="input-zone" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; margin-top:1.5rem;">
+        <!-- 按钮由JS动态生成 -->
     </div>
 
-    <div style="margin-top:2rem; display:flex; justify-content:space-around; background:var(--card); padding:1rem; border-radius:15px; border:1px solid rgba(255,255,255,0.05);">
-        <div style="text-align:center;"><div style="opacity:0.6; font-size:0.7rem;">当前进度</div><div id="game-progress" style="font-size:1.4rem; font-weight:900;">0 / 10</div></div>
-        <div style="text-align:center;"><div style="opacity:0.6; font-size:0.7rem;">反馈</div><div id="game-feedback" style="font-size:1.1rem; font-weight:bold; color:var(--gold);">等待中</div></div>
-    </div>
+    <div id="game-feedback" style="margin-top:1rem; text-align:center; font-weight:bold; min-height: 1.5rem;"></div>
 </div>
 
 <footer>
-    COPYRIGHT © 2026 墨点星痕 | 专业音乐识谱训练终极版
+    COPYRIGHT © 2025 墨点星痕 | 专业音乐识谱训练终极版
 </footer>
 
 <script>
-/** 1. 用户与日志存储系统 **/
+/** 0. 全局配置 **/
+const Config = {
+    displayMode: 'name', // 'name', 'sol', 'both'
+    solfegeMap: { 'C': 'Do', 'D': 'Re', 'E': 'Mi', 'F': 'Fa', 'G': 'Sol', 'A': 'La', 'B': 'Si' },
+    setMode(m) {
+        this.displayMode = m;
+        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('mode-' + m).classList.add('active');
+        if(!document.getElementById('game-view').classList.contains('hidden')) {
+            Game.renderInputButtons();
+            Game.renderInstruction();
+        }
+    },
+    formatNote(noteId) {
+        const name = noteId[0];
+        const oct = noteId.slice(1);
+        const sol = this.solfegeMap[name];
+        if(this.displayMode === 'sol') return sol + oct;
+        if(this.displayMode === 'both') return `${name}(${sol})${oct}`;
+        return noteId;
+    },
+    formatBase(name) {
+        if(this.displayMode === 'sol') return this.solfegeMap[name];
+        if(this.displayMode === 'both') return `${name}\n<small>${this.solfegeMap[name]}</small>`;
+        return name;
+    }
+};
+
+/** 1. 用户系统 **/
 const UserSystem = {
-    key: 'MelodyMaster_Ultimate_DB',
-    db: JSON.parse(localStorage.getItem('MelodyMaster_Ultimate_DB') || '{"users":{}, "logs":[], "current":null}'),
-    
+    key: 'MelodyMaster_V2_DB',
+    db: JSON.parse(localStorage.getItem('MelodyMaster_V2_DB') || '{"users":{}, "current":null}'),
     init() {
         if (!this.db.current) this.showLogin();
-        else {
-            this.applyUser(this.db.current);
-            this.logVisit(this.db.current);
-        }
+        else this.applyUser(this.db.current);
         this.renderLobby();
     },
     showLogin() {
@@ -165,7 +188,7 @@ const UserSystem = {
         list.innerHTML = '';
         Object.keys(this.db.users).forEach(u => {
             const d = document.createElement('div');
-            d.style = "padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:5px; cursor:pointer;";
+            d.style = "padding:12px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px; cursor:pointer; border:1px solid #334155";
             d.innerHTML = `👤 ${u}`;
             d.onclick = () => { document.getElementById('user-input').value = u; };
             list.appendChild(d);
@@ -178,11 +201,6 @@ const UserSystem = {
         this.db.current = name;
         this.save();
         location.reload();
-    },
-    logVisit(name) {
-        this.db.logs.unshift({ name, time: new Date().toLocaleString() });
-        if(this.db.logs.length > 10) this.db.logs.pop();
-        this.save();
     },
     applyUser(name) {
         document.getElementById('user-display').innerText = `学习者: ${name}`;
@@ -202,16 +220,15 @@ const UserSystem = {
             div.innerHTML = `
                 <h3>${l.title}</h3>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <button class="btn btn-sm" onclick="Game.start('${l.id}','identify')">识谱<br><small>${s?s.speed+'s':'NEW'}</small></button>
-                    <button class="btn btn-sm" onclick="Game.start('${l.id}','place')">标位<br><small>${p?p.speed+'s':'NEW'}</small></button>
+                    <button class="btn" style="padding:10px; font-size:0.8rem;" onclick="Game.start('${l.id}','identify')">识谱训练<br><small>${s?s.speed+'s':'NEW'}</small></button>
+                    <button class="btn" style="padding:10px; font-size:0.8rem;" onclick="Game.start('${l.id}','place')">标位训练<br><small>${p?p.speed+'s':'NEW'}</small></button>
                 </div>
             `;
             grid.appendChild(div);
         });
         const errList = document.getElementById('error-list');
-        const sorted = Object.entries(user.errors).sort((a,b)=>b[1]-a[1]).slice(0,10);
-        errList.innerHTML = sorted.length ? sorted.map(x=>`<span class="error-chip">${x[0]} <b>×${x[1]}</b></span>`).join('') : "暂无错题记录。";
-        document.getElementById('visit-logs').innerHTML = this.db.logs.map(l=>`<div class="log-item"><span>${l.name} 进入了实验室</span><span>${l.time}</span></div>`).join('');
+        const sorted = Object.entries(user.errors).sort((a,b)=>b[1]-a[1]).slice(0,12);
+        errList.innerHTML = sorted.length ? sorted.map(x=>`<span class="error-chip">${Config.formatNote(x[0])} <b>×${x[1]}</b></span>`).join('') : "记录完美，继续保持！";
     }
 };
 
@@ -221,7 +238,7 @@ const Music = {
     getY(noteId, clef) {
         const name = noteId[0], octave = parseInt(noteId.slice(1));
         const abs = octave * 7 + this.pitches.indexOf(name);
-        const center = (clef === 'treble') ? (4*7+6) : (3*7+1); // Treble B4, Bass D3
+        const center = (clef === 'treble') ? (4*7+6) : (3*7+1); // Treble B4(34), Bass D3(22)
         return 120 + (center - abs) * 10;
     },
     getNote(y, clef) {
@@ -231,62 +248,109 @@ const Music = {
     }
 };
 
-/** 3. 游戏核心逻辑 **/
+/** 3. 游戏核心 **/
 const Game = {
     levels: [
         { id: 't1', title: '高音基础 (E4-F5)', clef: 'treble', range: ['E4', 'F5'] },
-        { id: 't2', title: '高音进阶 (C4-C6)', clef: 'treble', range: ['C4', 'C6'] },
+        { id: 't2', title: '高音全域 (C4-C6)', clef: 'treble', range: ['C4', 'C6'] },
         { id: 'b1', title: '低音基础 (G2-A3)', clef: 'bass', range: ['G2', 'A3'] },
-        { id: 'b2', title: '低音进阶 (C2-E4)', clef: 'bass', range: ['C2', 'E4'] }
+        { id: 'b2', title: '低音全域 (C2-E4)', clef: 'bass', range: ['C2', 'E4'] },
+        { id: 'm1', title: '混合挑战 (大谱表全域)', clef: 'mixed', range: ['C2', 'C6'] }
     ],
-    state: { isWaiting: false, startTime: 0, timer: null },
+    state: { isWaiting: false, startTime: 0, timer: null, selectedNote: null },
 
     start(lid, mode) {
         const l = this.levels.find(x => x.id === lid);
-        this.state = { lid, mode, clef: l.clef, range: l.range, idx: 0, correct: 0, timeTotal: 0, sessionErrors: [], isWaiting: false };
+        this.state = { 
+            lid, mode, 
+            configClef: l.clef, 
+            range: l.range, 
+            idx: 0, 
+            correct: 0, 
+            timeTotal: 0, 
+            sessionErrors: [], 
+            isWaiting: false,
+            selectedNote: null
+        };
         document.getElementById('lobby-view').classList.add('hidden');
         document.getElementById('game-view').classList.remove('hidden');
         document.getElementById('input-zone').classList.toggle('hidden', mode === 'place');
+        document.getElementById('confirm-btn').style.display = (mode === 'place' ? 'block' : 'none');
+        
+        this.renderInputButtons();
         this.nextQuestion();
     },
 
+    renderInputButtons() {
+        const zone = document.getElementById('input-zone');
+        zone.innerHTML = '';
+        Music.pitches.forEach(p => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerHTML = Config.formatBase(p);
+            b.onclick = () => this.handleInput(p);
+            zone.appendChild(b);
+        });
+    },
+
     nextQuestion() {
-        if(this.state.idx >= 10) return this.end();
+        if(this.state.idx >= 20) return this.end();
         this.state.isWaiting = false;
+        this.state.selectedNote = null;
         document.getElementById('global-click-layer').style.display = 'none';
         document.getElementById('note-layer').innerHTML = '';
         document.getElementById('ledger-layer').innerHTML = '';
         document.getElementById('status-icons').innerHTML = '';
+        document.getElementById('confirm-btn').classList.remove('confirm-anim');
+        document.getElementById('ghost-note').setAttribute("cx", "-100");
         
-        // 智能出题：30% 概率抽该用户的错题
-        const user = UserSystem.db.users[UserSystem.db.current];
-        const errs = Object.keys(user.errors);
-        if(Math.random() < 0.3 && errs.length > 0) {
-            this.state.currNote = errs[Math.floor(Math.random()*errs.length)];
+        // 确定当前题目谱号
+        if(this.state.configClef === 'mixed') {
+            this.state.currentClef = Math.random() > 0.5 ? 'treble' : 'bass';
+            // 根据谱号限制抽题范围，避免低音谱号抽到太高的音
+            if(this.state.currentClef === 'treble') this.state.currentRange = ['C4', 'C6'];
+            else this.state.currentRange = ['C2', 'E4'];
         } else {
-            const pool = this.getPool(this.state.range);
-            this.state.currNote = pool[Math.floor(Math.random()*pool.length)];
+            this.state.currentClef = this.state.configClef;
+            this.state.currentRange = this.state.range;
         }
 
-        this.render();
+        // 抽题逻辑
+        const pool = this.getPool(this.state.currentRange);
+        this.state.currNote = pool[Math.floor(Math.random()*pool.length)];
+
+        this.renderClef();
+        this.renderInstruction();
+        
+        if(this.state.mode === 'identify') {
+            this.drawNote(this.state.currNote, 'standard');
+        }
+
+        document.getElementById('game-progress').textContent = `${this.state.idx + 1} / 20`;
         this.state.startTime = performance.now();
         this.startTimer();
     },
 
-    render() {
-        const { mode, currNote, clef, idx } = this.state;
-        document.getElementById('clef-render').textContent = clef === 'treble' ? '𝄞' : '𝄢';
-        document.getElementById('game-progress').textContent = `${idx + 1} / 10`;
-        if(mode === 'identify') {
-            document.getElementById('instruction').innerHTML = "这个音符叫什么？";
-            this.drawNote(currNote, 'standard');
+    renderClef() {
+        const el = document.getElementById('clef-render');
+        if(this.state.currentClef === 'treble') {
+            el.textContent = '𝄞'; el.setAttribute("y", "152");
         } else {
-            document.getElementById('instruction').innerHTML = `请标出位置: <b style="color:var(--gold); font-size:1.8rem;">${currNote}</b>`;
+            el.textContent = '𝄢'; el.setAttribute("y", "110");
+        }
+    },
+
+    renderInstruction() {
+        const ins = document.getElementById('instruction');
+        if(this.state.mode === 'identify') {
+            ins.innerHTML = "请辨认该音符名称";
+        } else {
+            ins.innerHTML = `请标出位置: <b style="color:var(--gold); font-size:1.6rem; margin-left:10px;">${Config.formatNote(this.state.currNote)}</b>`;
         }
     },
 
     drawNote(noteId, type, x = 200) {
-        const y = Music.getY(noteId, this.state.clef);
+        const y = Music.getY(noteId, this.state.currentClef);
         const g = document.getElementById('note-layer');
         const elp = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
         elp.setAttribute("cx", x); elp.setAttribute("cy", y);
@@ -296,17 +360,8 @@ const Game = {
         elp.setAttribute("transform", `rotate(-15, ${x}, ${y})`);
         g.appendChild(elp);
 
-        // 标签
-        if(type === 'correct' || type === 'wrong') {
-            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            t.setAttribute("x", x); t.setAttribute("y", y + 30);
-            t.setAttribute("font-weight", "900"); t.setAttribute("text-anchor", "middle");
-            t.setAttribute("fill", type === 'correct' ? 'var(--success)' : 'var(--danger)');
-            t.textContent = type === 'correct' ? "正确√" : "你点的×";
-            g.appendChild(t);
-        }
-
-        // 无限动态加线
+        // 动态补加线
+        const ledgerG = document.getElementById('ledger-layer');
         if (y <= 70 || y >= 170) {
             const isUp = y <= 70;
             const startY = isUp ? 60 : 180;
@@ -317,27 +372,34 @@ const Game = {
                 l.setAttribute("x1", x-25); l.setAttribute("x2", x+25);
                 l.setAttribute("y1", ly); l.setAttribute("y2", ly);
                 l.setAttribute("stroke", "#000"); l.setAttribute("stroke-width", "2.5");
-                document.getElementById('ledger-layer').appendChild(l);
+                ledgerG.appendChild(l);
             }
         }
+    },
+
+    // 标位模式点击确认
+    confirmPlacement() {
+        if(this.state.isWaiting || !this.state.selectedNote) return;
+        this.handleInput(this.state.selectedNote);
     },
 
     handleInput(val) {
         if(this.state.isWaiting) return;
         clearInterval(this.state.timer);
         this.state.isWaiting = true;
+        
         const elapsed = (performance.now() - this.state.startTime) / 1000;
         const isCorrect = (this.state.mode === 'identify') ? (val === this.state.currNote[0]) : (val === this.state.currNote);
 
         const fb = document.getElementById('game-feedback');
         if(isCorrect) {
             this.state.correct++; this.state.timeTotal += elapsed;
-            fb.innerHTML = `<span style="color:var(--success)">正确! ${elapsed.toFixed(2)}s</span>`;
+            fb.innerHTML = `<span style="color:var(--success)">太棒了! +1</span>`;
             this.drawIcon("O", "var(--success)");
-            setTimeout(() => this.nextQuestion(), 700);
+            setTimeout(() => this.nextQuestion(), 600);
         } else {
             this.state.sessionErrors.push(this.state.currNote);
-            fb.innerHTML = `<span style="color:var(--danger)">记错了!</span>`;
+            fb.innerHTML = `<span style="color:var(--danger)">答错了哦</span>`;
             this.drawIcon("X", "var(--danger)");
             this.showCorrection(val);
         }
@@ -346,7 +408,7 @@ const Game = {
 
     drawIcon(txt, color) {
         const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        t.setAttribute("x", "350"); t.setAttribute("y", "60");
+        t.setAttribute("x", "340"); t.setAttribute("y", "70");
         t.setAttribute("font-size", "60"); t.setAttribute("fill", color);
         t.setAttribute("font-weight", "900"); t.textContent = txt;
         document.getElementById('status-icons').appendChild(t);
@@ -357,10 +419,10 @@ const Game = {
         if(this.state.mode === 'place') {
             this.drawNote(wrongVal, 'wrong', 160);
             this.drawNote(this.state.currNote, 'correct', 240);
-            document.getElementById('instruction').innerHTML = `对比解析: 左侧为你点的, <span style="color:var(--success)">右侧为正确位置</span>`;
+            document.getElementById('instruction').innerHTML = `解析: <span style="color:var(--danger)">左侧为你选</span> | <span style="color:var(--success)">右侧为正确</span>`;
         } else {
             this.drawNote(this.state.currNote, 'correct', 200);
-            document.getElementById('instruction').innerHTML = `正确答案是: <span style="color:var(--success)">${this.state.currNote}</span>`;
+            document.getElementById('instruction').innerHTML = `正确答案: <b style="color:var(--success)">${Config.formatNote(this.state.currNote)}</b>`;
         }
         document.getElementById('global-click-layer').style.display = 'flex';
     },
@@ -384,14 +446,17 @@ const Game = {
     },
 
     end() {
-        const acc = (this.state.correct / 10) * 100;
+        const acc = (this.state.correct / 20) * 100;
         const speed = (this.state.timeTotal / (this.state.correct || 1)).toFixed(2);
         const user = UserSystem.db.users[UserSystem.db.current];
         const key = `${this.state.lid}_${this.state.mode}`;
-        if(!user.history[key] || acc > user.history[key].score) user.history[key] = { score: acc, speed };
+        
+        if(!user.history[key] || acc >= user.history[key].score) {
+            user.history[key] = { score: acc, speed };
+        }
         this.state.sessionErrors.forEach(n => user.errors[n] = (user.errors[n] || 0) + 1);
         UserSystem.save();
-        alert(`关卡结束！\n准确率: ${acc}%\n反应平均速度: ${speed}s`);
+        alert(`训练完成！\n正确率: ${acc}%\n平均用时: ${speed}s`);
         this.exit();
     },
 
@@ -403,29 +468,38 @@ const Game = {
     }
 };
 
-/** 4. 交互绑定 **/
-document.querySelectorAll('#input-zone .btn').forEach(b => {
-    b.onclick = () => Game.handleInput(b.dataset.p);
-});
-
+/** 4. 交互控制 **/
 const svgArea = document.getElementById('stave-click-area');
+
+// 手机/鼠标点击五线谱
 svgArea.addEventListener('pointerdown', (e) => {
     if(Game.state.isWaiting || Game.state.mode !== 'place') return;
     const r = svgArea.getBoundingClientRect();
     const y = (e.clientY - r.top) * (240 / r.height);
-    Game.handleInput(Music.getNote(y, Game.state.clef));
+    const snapY = Math.round(y/10)*10;
+    
+    // 更新辅助线和重影音符
+    document.getElementById('guide-line').setAttribute("y1", snapY);
+    document.getElementById('guide-line').setAttribute("y2", snapY);
+    
+    const note = Music.getNote(snapY, Game.state.currentClef);
+    Game.state.selectedNote = note;
+    
+    const g = document.getElementById('ghost-note');
+    g.setAttribute("cy", snapY); g.setAttribute("cx", "200");
+    
+    // 激活确认按钮动画
+    document.getElementById('confirm-btn').classList.add('confirm-anim');
 });
 
+// 辅助线跟随移动
 svgArea.addEventListener('pointermove', (e) => {
+    if(Game.state.isWaiting) return;
     const r = svgArea.getBoundingClientRect();
     const y = (e.clientY - r.top) * (240 / r.height);
     const snapY = Math.round(y/10)*10;
     document.getElementById('guide-line').setAttribute("y1", snapY);
     document.getElementById('guide-line').setAttribute("y2", snapY);
-    if(Game.state.mode === 'place' && !Game.state.isWaiting) {
-        const g = document.getElementById('ghost-note');
-        g.setAttribute("cy", snapY); g.setAttribute("cx", "200");
-    }
 });
 
 window.onload = () => UserSystem.init();
